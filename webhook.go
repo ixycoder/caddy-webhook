@@ -81,7 +81,7 @@ type WebHook struct {
 	Token string `json:"token,omitempty"`
 
 	hook  webhooks.HookService
-	auth  transport.AuthMethod
+	Auth  transport.AuthMethod
 	cmd   *Cmd
 	depth int
 	repo  *Repo
@@ -144,14 +144,14 @@ func (w *WebHook) Provision(ctx caddy.Context) error {
 	}
 
 	if w.Username != "" && w.Password != "" {
-		w.auth = &githttp.BasicAuth{
+		w.Auth = &githttp.BasicAuth{
 			Username: w.Username,
 			Password: w.Password,
 		}
 	}
 
 	if w.Token != "" {
-		w.auth = &githttp.BasicAuth{
+		w.Auth = &githttp.BasicAuth{
 			Username: "git", // This can be anything.
 			Password: w.Token,
 		}
@@ -162,7 +162,7 @@ func (w *WebHook) Provision(ctx caddy.Context) error {
 		if err != nil {
 			return err
 		}
-		w.auth = publicKeys
+		w.Auth = publicKeys
 	}
 
 	w.repo = NewRepo(w)
@@ -185,15 +185,15 @@ func (w *WebHook) Validate() error {
 		return fmt.Errorf("cannot create repository in empty path")
 	}
 
-	if w.Key != "" && w.auth.Name() != ssh.PublicKeysName {
+	if w.Key != "" && w.Auth.Name() != ssh.PublicKeysName {
 		return fmt.Errorf("wrong auth method with public key")
 	}
 
-	if w.Username != "" && w.Password != "" && w.auth.Name() != "http-basic-auth" {
+	if w.Username != "" && w.Password != "" && w.Auth.Name() != "http-basic-auth" {
 		return fmt.Errorf("wrong auth method with username and password")
 	}
 
-	if w.Token != "" && w.auth.Name() != "http-basic-auth" {
+	if w.Token != "" && w.Auth.Name() != "http-basic-auth" {
 		return fmt.Errorf("wrong auth method with token")
 	}
 

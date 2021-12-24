@@ -41,7 +41,7 @@ func NewRepo(w *WebHook) *Repo {
 		Branch: w.Branch,
 		Depth:  w.depth,
 		Secret: w.Secret,
-		Auth:   w.auth,
+		Auth:   w.Auth,
 		cmd:    w.cmd,
 		log:    w.log,
 	}
